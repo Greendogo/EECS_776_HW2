@@ -1,6 +1,6 @@
 -- Author: Paul McELroy
 -- Date: 10/12/2016
--- A demonstation of a summing a tree named myTree using:
+-- Implementations of functions for summing a Tree:
 -- summation1 - a function that takes a Tree and uses pure recursion to sum it's leaf nodes.
 -- summation2 - a function that takes a Tree and uses the State monad to sum it's leaf nodes.
 -- GitHub Repository: https://github.com/Greendogo/EECS_776_HW2
@@ -9,11 +9,14 @@
 
 import Control.Monad (ap)
 
+--I was wondering why you defined a tree to only
+--have values at its nodes instead of at each node?
 data Tree :: * where
   Leaf :: Int -> Tree
   Node :: Tree -> Tree -> Tree
   deriving (Show, Eq, Ord)
 
+--Example tree to call the summation1 and summation2 functions with.
 myTree :: Tree
 myTree =
   Node
@@ -35,7 +38,7 @@ myTree =
       (Leaf 5)
     )
 
---Part 1
+--Part 1 -- Pure Recursion
 summation1 :: Tree -> Int
 summation1 (Leaf a) = a
 summation1 (Node l r) = summation1 l + summation1 r
@@ -51,7 +54,7 @@ summation1 (Node l r) = summation1 l + summation1 r
 --[6]
 
 
---Part 2
+--Part 2 -- Using the State monad (and recursion)
 newtype State s a = State (s -> (a,s))
 
 instance Monad (State s) where
@@ -83,6 +86,10 @@ summationM (Leaf n) = do
 summationM (Node l r) = do
   summationM l
   summationM r
+--Although I do like how it looks like I'm just adding leaf node values
+--and recursing over nodes.  I suppose that's a little more intuitive than
+--doing it without monads.
+
 
 summation2 :: Tree -> Int
 summation2 t = snd $ runState (summationM t) 0
